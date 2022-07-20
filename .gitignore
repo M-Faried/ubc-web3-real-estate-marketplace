@@ -1,4 +1,4 @@
 node_modules
-".github"
+github-workflow
 /package-lock.json
 eth-contracts/secrets.js

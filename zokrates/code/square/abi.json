@@ -1,0 +1,17 @@
+{
+  "inputs": [
+    {
+      "name": "root",
+      "public": true,
+      "type": "field"
+    },
+    {
+      "name": "target",
+      "public": true,
+      "type": "field"
+    }
+  ],
+  "output": {
+    "type": "bool"
+  }
+}

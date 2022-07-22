@@ -1,0 +1,4 @@
+def main(field root, field target) -> bool {
+    bool result = root * root == target;
+    return result;
+}

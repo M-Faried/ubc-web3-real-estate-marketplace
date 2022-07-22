@@ -2,3 +2,4 @@ node_modules
 github-workflow
 /package-lock.json
 eth-contracts/secrets.js
+eth-contracts/build

@@ -14,18 +14,66 @@ contract Ownable {
     //  4) fill out the transferOwnership function
     //  5) create an event that emits anytime ownerShip is transfered (including in the constructor)
 
+    address private _owner;
+
+    modifier onlyOwner() {
+        require(msg.sender == _owner, "This is only accessible by the owner.");
+        _;
+    }
+
+    event OwnershipChanged(address newOwner);
+
+    constructor(address owner) internal {
+        _owner = owner;
+        emit OwnershipChanged(owner);
+    }
+
+    function getOwner() external view returns (address) {
+        return _owner;
+    }
+
     function transferOwnership(address newOwner) public onlyOwner {
         // TODO add functionality to transfer control of the contract to a newOwner.
         // make sure the new owner is a real address
+        require(newOwner != address(0), "Invalid owner address");
+        _owner = newOwner;
+        emit OwnershipChanged(newOwner);
     }
 }
 
-//  TODO's: Create a Pausable contract that inherits from the Ownable contract
-//  1) create a private '_paused' variable of type bool
-//  2) create a public setter using the inherited onlyOwner modifier
-//  3) create an internal constructor that sets the _paused variable to false
-//  4) create 'whenNotPaused' & 'paused' modifier that throws in the appropriate situation
-//  5) create a Paused & Unpaused event that emits the address that triggered the event
+contract Pausable is Ownable {
+    //  TODO's: Create a Pausable contract that inherits from the Ownable contract
+    //  1) create a private '_paused' variable of type bool
+    //  2) create a public setter using the inherited onlyOwner modifier
+    //  3) create an internal constructor that sets the _paused variable to false
+    //  4) create 'whenNotPaused' & 'paused' modifier that throws in the appropriate situation
+    //  5) create a Paused & Unpaused event that emits the address that triggered the event
+
+    bool private _paused;
+
+    constructor() internal {
+        _paused = false;
+    }
+
+    modifier whenNotPaused() {
+        require(!_paused, "The contract is currently paused");
+        _;
+    }
+
+    modifier paused() {
+        require(_paused, "The contract is currently operational (Not Paused)");
+        _;
+    }
+
+    event Paused(address sender);
+    event Unpaused(address sender);
+
+    function setPaused(bool value) external onlyOwner {
+        _paused = value;
+        if (value) emit Paused(msg.sender);
+        else emit Unpaused(msg.sender);
+    }
+}
 
 contract ERC165 {
     bytes4 private constant _INTERFACE_ID_ERC165 = 0x01ffc9a7;
@@ -492,7 +540,7 @@ contract ERC721Metadata is ERC721Enumerable, usingOraclize {
 
     function tokenURI(uint256 tokenId) external view returns (string memory) {
         require(_exists(tokenId));
-        return _tokenURIs[tokenId];
+        // return _tokenURIs[tokenId];
     }
 
     // TODO: Create an internal function to set the tokenURI of a specified tokenId

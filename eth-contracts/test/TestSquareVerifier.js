@@ -9,6 +9,7 @@
 
 const Web3 = require('web3');
 const abiFile = require('../build/contracts/SquareVerifier.json');
+const proof = require('../../zokrates/code/square/proof.json');
 
 contract('Zokrates Verifier Tests', async (accounts) => {
 
@@ -17,7 +18,7 @@ contract('Zokrates Verifier Tests', async (accounts) => {
         const owner = accounts[0];
         const testAccounts = accounts.slice(1);
 
-        const address = '0x1866ac53581897EccB39CB0df3c6386214c4531f'; // verifier contract address           
+        const address = '0x1866ac53581897EccB39CB0df3c6386214c4531f'; // verifier contract address on local ganache network.      
         const abi = abiFile.abi;
         const web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:7545"));
         const squareVerifier = new web3.eth.Contract(abi, address, { from: owner });
@@ -30,10 +31,43 @@ contract('Zokrates Verifier Tests', async (accounts) => {
         }
     });
 
-    it('initializes correctly', () => {
-        console.log('Here is the configuration object');
-        console.log(config);
-        assert(true, true, "Everything is working fine");
+    it('verifies with correct proof', async () => {
+
+        // Calculating the results using the generated proof.
+        let result = await config.squareVerifier.methods
+            .verifyTx(proof.proof, proof.inputs)
+            .call({ from: config.owner });
+
+        assert(result, true, 'The valid proof was not verified correctly.');
+    });
+
+    it('refuses to verify incorrect proof', async () => {
+
+        // Tampering the proof.
+
+        // Creating a copy of the original proof.
+        let tamperedProof = { ...proof.proof };
+
+        // Converting the A value to an array and chaning the value of the first element.
+        let firstAvalue = Array.from(tamperedProof.a[0]);
+        firstAvalue[2] = '5';
+
+        // Resetting the first A value with the in correct data.
+        tamperedProof.a[0] = firstAvalue.join('');
+
+        // Checking the verification result.
+        let errorReported = false
+        try {
+            // Calculating the result.
+            await config.squareVerifier.methods
+                .verifyTx(tamperedProof, proof.inputs)
+                .call({ from: config.owner });
+        }
+        catch (e) {
+            errorReported = true;
+        }
+
+        assert(errorReported, true, 'The invalid proof was verified incorrectly.');
     });
 
 })

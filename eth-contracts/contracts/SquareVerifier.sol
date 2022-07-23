@@ -195,7 +195,7 @@ library Pairing {
     }
 }
 
-contract Verifier {
+contract SquareVerifier {
     using Pairing for *;
     struct VerifyingKey {
         Pairing.G1Point alpha;

@@ -343,7 +343,7 @@ library CBOR {
 End solidity-cborutils
 
 */
-contract usingOraclize {
+contract Oraclize {
     using CBOR for Buffer.buffer;
 
     OraclizeI oraclize;

@@ -7,37 +7,26 @@
 
 // Test verification with incorrect proof
 
-const Web3 = require('web3');
-const abiFile = require('../build/contracts/SquareVerifier.json');
+// const Web3 = require('web3');
+// const abiFile = require('../build/contracts/SquareVerifier.json');
+const SquareVerifier = artifacts.require('SquareVerifier')
 const proof = require('../../zokrates/code/square/proof.json');
 
 contract('Zokrates Verifier Tests', async (accounts) => {
 
-    let config;
+    const config = {
+        owner: accounts[0],
+        testAccounts: accounts.slice(1),
+    };
+
     before('setup contract', async () => {
-        const owner = accounts[0];
-        const testAccounts = accounts.slice(1);
-
-        const address = '0x1866ac53581897EccB39CB0df3c6386214c4531f'; // verifier contract address on local ganache network.      
-        const abi = abiFile.abi;
-        const web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:7545"));
-        const squareVerifier = new web3.eth.Contract(abi, address, { from: owner });
-
-        config = {
-            web3,
-            owner,
-            testAccounts,
-            squareVerifier
-        }
+        this.contract = await SquareVerifier.new({ from: config.owner });
     });
 
     it('verifies with correct proof', async () => {
 
         // Calculating the results using the generated proof.
-        let result = await config.squareVerifier.methods
-            .verifyTx(proof.proof, proof.inputs)
-            .call({ from: config.owner });
-
+        let result = await this.contract.verifyTx(proof.proof, proof.inputs, { from: config.owner });
         assert(result, true, 'The valid proof was not verified correctly.');
     });
 
@@ -59,9 +48,7 @@ contract('Zokrates Verifier Tests', async (accounts) => {
         let errorReported = false
         try {
             // Calculating the result.
-            await config.squareVerifier.methods
-                .verifyTx(tamperedProof, proof.inputs)
-                .call({ from: config.owner });
+            await this.contract.verifyTx(tamperedProof, proof.inputs, { from: config.owner });
         }
         catch (e) {
             errorReported = true;

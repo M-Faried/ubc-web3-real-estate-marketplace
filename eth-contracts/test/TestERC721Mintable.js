@@ -1,6 +1,4 @@
 const ERC721Mintable = artifacts.require('ERC721Mintable');
-const BigNumber = require('bignumber.js');
-
 
 const idGenerator = (function () {
     let seed = 0;
@@ -57,15 +55,17 @@ contract('TestERC721Mintable', accounts => {
             let fromAccount = config.owner;
             let toAccount = config.testAccounts[0];
 
+            // Making the transefer.
             await this.contract.transferFrom(fromAccount, toAccount, 1, { from: fromAccount });
 
+            // Checking the state of the contract after the transfer.
             let fromBalance = await this.contract.balanceOf(fromAccount);
             let toBalance = await this.contract.balanceOf(toAccount);
             let currentOwner = await this.contract.ownerOf(1);
 
+            assert(currentOwner, toAccount, "Incorrect token owner.");
             assert(fromBalance, 3, "The balance of the from account is not decremented");
             assert(toBalance, 1, "The balance of the to account is not incremented");
-            assert(currentOwner, toAccount, "Incorrect token owner.");
         })
     });
 

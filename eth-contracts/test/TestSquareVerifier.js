@@ -82,6 +82,4 @@ contract('Zokrates Verifier Tests', async (accounts) => {
         assert(result, true, 'The valid proof was not verified correctly.');
     })
 
-
-
 })

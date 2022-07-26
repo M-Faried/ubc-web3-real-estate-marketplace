@@ -18,12 +18,7 @@
  *
  */
 
-// const HDWalletProvider = require('truffle-hdwallet-provider');
-// const infuraKey = "fj4jll3k.....";
-//
-// const fs = require('fs');
-// const mnemonic = fs.readFileSync(".secret").toString().trim();
-
+const HDWalletProvider = require('truffle-hdwallet-provider');
 const { INFURA_NETWORK_ID, WALLET_MNEOMONIC } = require('./secrets.js');
 
 module.exports = {

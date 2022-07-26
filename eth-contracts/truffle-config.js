@@ -48,7 +48,14 @@ module.exports = {
 
     ropsten: {
       provider: () => new HDWalletProvider(WALLET_MNEOMONIC, `https://ropsten.infura.io/v3/${INFURA_NETWORK_ID}`),
-      network_id: 3,       // rinkeby's id
+      network_id: 3,       // ropsten's id
+      gas: 4500000,        // ropsten has a lower block limit than mainnet
+      gasPrice: 10000000000
+    },
+
+    rinkeby: {
+      provider: () => new HDWalletProvider(WALLET_MNEOMONIC, `https://rinkeby.infura.io/v3/${INFURA_NETWORK_ID}`),
+      network_id: 4,       // rinkeby's id
       gas: 4500000,        // rinkeby has a lower block limit than mainnet
       gasPrice: 10000000000
     },

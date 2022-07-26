@@ -10,7 +10,8 @@
 // const Web3 = require('web3');
 // const abiFile = require('../build/contracts/SquareVerifier.json');
 const SquareVerifier = artifacts.require('SquareVerifier')
-const proof = require('../../zokrates/code/square/proof.json');
+const proof_1 = require('../../zokrates/code/square/proof_1.json');
+const proof_2 = require('../../zokrates/code/square/proof_2.json');
 
 contract('Zokrates Verifier Tests', async (accounts) => {
 
@@ -24,18 +25,23 @@ contract('Zokrates Verifier Tests', async (accounts) => {
     });
 
     it('verifies with correct proof', async () => {
-
         // Calculating the results using the generated proof.
-        let result = await this.contract.verifyTx(proof.proof.a, proof.proof.b, proof.proof.c, proof.inputs, { from: config.owner });
+        let result = await this.contract.verifyTx(
+            proof_1.proof.a,
+            proof_1.proof.b,
+            proof_1.proof.c,
+            proof_1.inputs,
+            { from: config.owner }
+        );
         assert(result, true, 'The valid proof was not verified correctly.');
-    });
+    })
 
     it('refuses to verify incorrect proof', async () => {
 
         // Tampering the proof.
 
         // Creating a copy of the original proof.
-        let tamperedProof = { ...proof.proof };
+        let tamperedProof = { ...proof_1.proof };
 
         // Converting the A value to an array and chaning the value of the first element.
         let firstAvalue = Array.from(tamperedProof.a[0]);
@@ -48,13 +54,34 @@ contract('Zokrates Verifier Tests', async (accounts) => {
         let errorReported = false
         try {
             // Calculating the result.
-            await this.contract.verifyTx(tamperedProof.a, tamperedProof.b, tamperedProof.c, proof.inputs, { from: config.owner });
+            await this.contract.verifyTx(
+                tamperedProof.a,
+                tamperedProof.b,
+                tamperedProof.c,
+                proof_1.inputs,
+                { from: config.owner }
+            );
         }
         catch (e) {
             errorReported = true;
         }
 
         assert(errorReported, true, 'The invalid proof was verified incorrectly.');
-    });
+    })
+
+    it('verifies with another correct proof', async () => {
+        // Calculating the results using the generated proof.
+        // Testing for the generated proof for the inputs 5 25
+        let result = await this.contract.verifyTx(
+            proof_2.proof.a,
+            proof_2.proof.b,
+            proof_2.proof.c,
+            proof_2.inputs,
+            { from: config.owner }
+        );
+        assert(result, true, 'The valid proof was not verified correctly.');
+    })
+
+
 
 })

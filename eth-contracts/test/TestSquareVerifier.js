@@ -26,7 +26,7 @@ contract('Zokrates Verifier Tests', async (accounts) => {
     it('verifies with correct proof', async () => {
 
         // Calculating the results using the generated proof.
-        let result = await this.contract.verifyTx(proof.proof, proof.inputs, { from: config.owner });
+        let result = await this.contract.verifyTx(proof.proof.a, proof.proof.b, proof.proof.c, proof.inputs, { from: config.owner });
         assert(result, true, 'The valid proof was not verified correctly.');
     });
 
@@ -48,7 +48,7 @@ contract('Zokrates Verifier Tests', async (accounts) => {
         let errorReported = false
         try {
             // Calculating the result.
-            await this.contract.verifyTx(tamperedProof, proof.inputs, { from: config.owner });
+            await this.contract.verifyTx(tamperedProof.a, tamperedProof.b, tamperedProof.c, proof.inputs, { from: config.owner });
         }
         catch (e) {
             errorReported = true;

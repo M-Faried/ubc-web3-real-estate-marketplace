@@ -308,11 +308,12 @@ contract SquareVerifier {
         );
     }
 
-    function verify(uint256[] memory input, Proof memory proof)
-        internal
-        view
-        returns (uint256)
-    {
+    function verify(
+        uint256[] memory input,
+        uint256[2] memory a,
+        uint256[2][2] memory b,
+        uint256[2] memory c
+    ) internal view returns (uint256) {
         uint256 snark_scalar_field = 21888242871839275222246405745257275088548364400416034343698204186575808495617;
         VerifyingKey memory vk = verifyingKey();
         require(input.length + 1 == vk.gamma_abc.length);
@@ -326,13 +327,14 @@ contract SquareVerifier {
             );
         }
         vk_x = Pairing.addition(vk_x, vk.gamma_abc[0]);
+
         if (
             !Pairing.pairingProd4(
-                proof.a,
-                proof.b,
+                Pairing.G1Point({X: a[0], Y: a[1]}),
+                Pairing.G2Point({X: b[0], Y: b[1]}),
                 Pairing.negate(vk_x),
                 vk.gamma,
-                Pairing.negate(proof.c),
+                Pairing.negate(Pairing.G1Point({X: c[0], Y: c[1]})),
                 vk.delta,
                 Pairing.negate(vk.alpha),
                 vk.beta
@@ -341,17 +343,18 @@ contract SquareVerifier {
         return 0;
     }
 
-    function verifyTx(Proof memory proof, uint256[3] memory input)
-        public
-        view
-        returns (bool r)
-    {
+    function verifyTx(
+        uint256[2] memory a,
+        uint256[2][2] memory b,
+        uint256[2] memory c,
+        uint256[3] memory input
+    ) public view returns (bool r) {
         uint256[] memory inputValues = new uint256[](3);
 
         for (uint256 i = 0; i < input.length; i++) {
             inputValues[i] = input[i];
         }
-        if (verify(inputValues, proof) == 0) {
+        if (verify(inputValues, a, b, c) == 0) {
             return true;
         } else {
             return false;

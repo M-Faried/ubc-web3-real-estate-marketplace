@@ -21,19 +21,15 @@ import "./ERC721Mintable.sol";
 //  - make sure you handle metadata as well as tokenSuplly
 
 contract IVerifier {
-    //  function verifyTx(Proof memory proof, uint256[3] memory input)
+    // function verifyTx(Pairing.Proof memory proof, uint256[3] memory input)
     //     public
     //     view
-    //     returns (bool r)
+    //     returns (bool r);
+
     function verifyTx(
         uint256[2] memory a,
-        uint256[2] memory a_p,
         uint256[2][2] memory b,
-        uint256[2] memory b_p,
         uint256[2] memory c,
-        uint256[2] memory c_p,
-        uint256[2] memory h,
-        uint256[2] memory k,
         uint256[3] memory input
     ) public returns (bool r);
 }
@@ -55,28 +51,30 @@ contract SolnSquareVerifier is ERC721Mintable {
         _verifier = IVerifier(verifier);
     }
 
-    // function mintNFT(owner, tokenId, Proof memory proof, uint256[3] memory input) public returns(bool)
+    // function mintNFT(
+    //     address owner,
+    //     uint256 tokenId,
+    //     Pairing.Proof memory proof,
+    //     uint256[3] memory input
+    // ) public returns (bool) {
     function mintNFT(
         address owner,
         uint256 tokenId,
         uint256[2] memory a,
-        uint256[2] memory a_p,
         uint256[2][2] memory b,
-        uint256[2] memory b_p,
         uint256[2] memory c,
-        uint256[2] memory c_p,
-        uint256[2] memory h,
-        uint256[2] memory k,
         uint256[3] memory input
     ) public returns (bool) {
         // Calculating the solution key.
-        bytes32 key = _getKey(a, a_p, b, b_p, c, c_p, h, k, input);
+        // bytes32 key = _getKey(proof, input);
+        bytes32 key = _getKey(a, b, c, input);
 
         // Making sure the solution doesn't already exist
         require(!_solutionsMapping[key].exist, "Solution already exists");
 
         // Verifiying the proof and the input.
-        bool verified = _verifier.verifyTx(a, a_p, b, b_p, c, c_p, h, k, input);
+        // bool verified = _verifier.verifyTx(proof, input);
+        bool verified = _verifier.verifyTx(a, b, c, input);
         require(verified, "Unable to verify token.");
 
         // Minting the token
@@ -107,18 +105,18 @@ contract SolnSquareVerifier is ERC721Mintable {
         emit SolutionAdded(owner, tokenId);
     }
 
-    // function _getKey(Proof memory proof, uint256[3] memory input);
+    // function _getKey(Pairing.Proof memory proof, uint256[3] memory input)
+    //     private
+    //     pure
+    //     returns (bytes23)
+    // {
     function _getKey(
         uint256[2] memory a,
-        uint256[2] memory a_p,
         uint256[2][2] memory b,
-        uint256[2] memory b_p,
         uint256[2] memory c,
-        uint256[2] memory c_p,
-        uint256[2] memory h,
-        uint256[2] memory k,
         uint256[3] memory input
-    ) internal pure returns (bytes32) {
-        return keccak256(abi.encodePacked(a, a_p, b, b_p, c, c_p, h, k, input));
+    ) private pure returns (bytes32) {
+        // return keccak256(abi.encodePacked(proof, input));
+        return keccak256(abi.encodePacked(a, b, c, input));
     }
 }
